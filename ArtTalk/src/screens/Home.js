@@ -13,7 +13,7 @@ const Home = ({navigation}) => {
         }}>
            <View style={{
                backgroundColor:"#00a46c",
-               height:"28%",
+               height:"18%",
                borderBottomLeftRadius:20,
                borderBottomRightRadius:20,
                paddingHorizontal:20
@@ -23,7 +23,7 @@ const Home = ({navigation}) => {
                     style={{
                         height:10,
                         width:20,
-                        marginTop:50
+                        marginTop:10
                     }}
                />
                <View style={{
@@ -39,12 +39,7 @@ const Home = ({navigation}) => {
                             fontWeight:"bold"
                         }}>Welcome to ArtTalk!</Text>
                    </View>
-                   <View style={{width:"50%",alignItems:"flex-end"}}>
-                        <Image
-                            source={require('../images/g.png')}
-                            style={{height:60,width:60}}
-                        />
-                   </View>
+                 
                </View>
            </View>
            <LinearGradient
@@ -127,7 +122,7 @@ const Home = ({navigation}) => {
                 <ScrollView 
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    style={{ paddingBottom: 100 }} // Adjust padding to handle content size
+                    style={{ paddingBottom: 10 }} // Adjust padding to handle content size
                     >
                     <LinearGradient
                         colors={["rgba(0,164,109,0.09)", "transparent"]}
@@ -267,13 +262,12 @@ const Home = ({navigation}) => {
 
                 
 
-
-               <View style={{
+        <View style={{
                    flexDirection:"row",
                    paddingHorizontal:20,
                    width:"100%",
                    alignItems:"center",
-                   marginTop:-80,
+                   marginTop:-10
                }}>
                    <View style={{width:"50%"}}>
                         <Text style={{
@@ -306,20 +300,129 @@ const Home = ({navigation}) => {
                         </View>
                    </View>
                </View>
-                <ScrollView
+
+            
+        
+                <ScrollView 
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    style={{marginBottom:-100}}
-                >
-                    <Image
-                        source={require("../images/18.png")}
-                        style={{marginTop:20,marginHorizontal:20}}
+                    style={{ paddingBottom: 10 }} // Adjust padding to handle content size
+                    >
+                    <LinearGradient
+                        colors={["rgba(0,164,109,0.09)", "transparent"]}
+                        style={{
+                            position:"absolute",
+                            left:0,
+                            right:0,
+                            height:100,
+                            marginTop:220,
+                            top:0
+                        }}
                     />
-                     <Image
-                        source={require("../images/19.png")}
-                        style={{marginTop:20,borderRadius:10}}
-                    />
-                </ScrollView>
+                    <TouchableOpacity 
+                        onPress={()=>navigation.navigate("Detail")}
+                        style={{
+                            height:300,
+                            elevation:2,
+                            backgroundColor:"#FFF",
+                            marginLeft:20,
+                            marginTop:20,
+                            borderRadius:15,
+                            marginBottom:10,
+                            width:200
+                        }}
+                    >
+                        <Image
+                            source={require('../images/12518.jpg')}
+                            style={{
+                                height: 200, // set the height you want
+                                width: '100%', // set the width you want
+                                resizeMode: 'cover', // or 'contain' if you want to see the whole image without cropping
+                              }}
+                        />
+                        <View style={{
+                            flexDirection:"row",
+                            paddingTop:10,
+                            paddingHorizontal:10
+                        }}>
+                            <Text style={{
+                                fontWeight:"bold"
+                            }}>Leonardo da Vinci</Text>
+                            
+                        </View>
+                       
+                    </TouchableOpacity>
+
+                    <View 
+                        onPress={()=>navigation.navigate("Detail")}
+                        style={{
+                            height:300,
+                            elevation:2,
+                            backgroundColor:"#FFF",
+                            marginLeft:20,
+                            marginTop:20,
+                            borderRadius:15,
+                            marginBottom:10,
+                            width:200
+                        }}
+                    >
+                        <Image
+                            source={require('../images/images.jpeg')}
+                            style={{
+                                height: 200, // set the height you want
+                                width: '100%', // set the width you want
+                                resizeMode: 'cover', // or 'contain' if you want to see the whole image without cropping
+                              }}
+                        />
+                        <View style={{
+                            flexDirection:"row",
+                            paddingTop:10,
+                            paddingHorizontal:10
+                        }}>
+                            <Text style={{
+                                fontWeight:"bold"
+                            }}>Vincent van Gogh</Text>
+                           
+                        </View>
+                        
+                    </View>
+
+                    <View 
+                         onPress={()=>navigation.navigate("Detail")}
+                        style={{
+                            height:300,
+                            elevation:2,
+                            backgroundColor:"#FFF",
+                            marginLeft:20,
+                            marginTop:20,
+                            borderRadius:15,
+                            marginBottom:10,
+                            width:200
+                        }}
+                    >
+                        <Image
+                            source={require('../images/monet.jpg')}
+                            style={{
+                                height: 200, // set the height you want
+                                width: '100%', // set the width you want
+                                resizeMode: 'cover', // or 'contain' if you want to see the whole image without cropping
+                              }}
+                        />
+                        <View style={{
+                            flexDirection:"row",
+                            paddingTop:10,
+                            paddingHorizontal:10
+                        }}>
+                            <Text style={{
+                                fontWeight:"bold"
+                            }}>Claude Monet</Text>
+                            
+                        </View>
+                        
+                    </View>
+
+                </ScrollView>                    
+              
         </View>
         </ScrollView>
 

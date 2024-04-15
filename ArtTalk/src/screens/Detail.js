@@ -1,6 +1,6 @@
 import React from 'react'
 import {View, Text,Image } from 'react-native'
-import SwiperComponent from '../components/SwiperComponent'
+//import SwiperComponent from '../components/SwiperComponent'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 
 const Detail = ({navigation}) => {
@@ -27,9 +27,20 @@ const Detail = ({navigation}) => {
                         
                 </View>
                 <View style={{width:"90%"}}>
-                        <SwiperComponent/>
+                        
+                        <Image
+                            source={require('../images/1.jpeg')}
+                            style={{
+                                marginLeft:10,
+                                marginBottom:130,
+                                height:500,
+                                width:420,
+                                marginTop:60,
+                              }}
+                        />
                 </View>
-            </View>
+                
+                </View>
 
                         <View style={{
                             flexDirection:"row",
@@ -42,7 +53,7 @@ const Detail = ({navigation}) => {
                                 fontSize:28,
                                 color:"#62636a"
                             }}>
-                                Angelica
+                                Mona Lisa
                             </Text>
                         
                         </View>
@@ -54,7 +65,7 @@ const Detail = ({navigation}) => {
                             paddingTop:3,
                             fontSize:20
                         }}>
-                            Russia
+                            Leonardo Da Vinci
                         </Text>
 
                         <View style={{
