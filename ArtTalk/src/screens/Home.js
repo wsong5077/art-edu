@@ -37,7 +37,7 @@ const Home = ({navigation}) => {
                             fontSize:25,
                             color:"#FFF",
                             fontWeight:"bold"
-                        }}>Start a ArtTalk Conversation!</Text>
+                        }}>Start an ArtTalk Conversation!</Text>
                    </View>
                  
                </View>
