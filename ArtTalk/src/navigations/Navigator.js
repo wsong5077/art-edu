@@ -6,6 +6,8 @@ import Detail from '../screens/Detail'
 import Detailmodule from '../screens/module_detail'
 import Detailmoduleartist from '../screens/module_detail copy'
 import Scan from '../screens/Scan'
+import LoginScreen from '../screens/LoginScreen'
+import SignupScreen from '../screens/SignupScreen'
 import Profile from '../screens/Profile'
 import {Image} from 'react-native'
 
@@ -80,6 +82,8 @@ const HomeStackNavigator = () => {
             <Stack.Screen name="Detail" component={Detail}/>
             <Stack.Screen name="Detailmodule" component={Detailmodule}/>
             <Stack.Screen name="Detailmoduleartist" component={Detailmoduleartist}/>
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Signup" component={SignupScreen} />
 
         </Stack.Navigator>
     )
