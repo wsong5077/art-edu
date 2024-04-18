@@ -1,45 +1,72 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView,Dimensions } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 const screenWidth = Dimensions.get('window').width;
-
 
 const Detailmoduleartist = ({ navigation, route }) => {
     const { artwork } = route.params;
+    const [showDescription, setShowDescription] = useState(false); // State to toggle description
+    console.log(artwork.description);
+
 
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView style={styles.container}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Image
+                            source={require('../images/17.png')}
+                            style={styles.backIcon}
+                        />
+                    </TouchableOpacity>
                     <Image
-                        source={require('../images/17.png')}
-                        style={styles.backIcon}
+                        source={{ uri: artwork.imageUri }}
+                        style={styles.artworkImage}
                     />
-                </TouchableOpacity>
-                <Image
-                    source={{ uri: artwork.imageUri }}
-                    style={styles.artworkImage}
-                />
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>
                         {artwork.title}
                     </Text>
+                   
                 </View>
-                
+                {/* Conditional rendering for description */}
+                {showDescription && (
+                    <View style={styles.descriptionContainer}>
+                        <Text style={styles.description}>
+                            {artwork.description}
+                        </Text>
+                    </View>
+                )}
+
             </ScrollView>
             <View style={styles.actionContainer}>
                 <TouchableOpacity style={styles.chatButton}>
                     <Text style={styles.chatButtonText}>Chat with AI</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.descriptionButton}>
+                <TouchableOpacity style={styles.descriptionButton} onPress={() => {
+                    console.log('Description button pressed');
+                    setShowDescription(!showDescription);
+                }}>
                     <Text style={styles.descriptionButtonText}>Description</Text>
                 </TouchableOpacity>
+
             </View>
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    descriptionContainer: {
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+    },
+    description: {
+        fontSize: 16,
+        color: "#62636a",
+    },
+    descriptionButtonText: {
+        color: "#00a46c",
+        fontWeight: "bold",
+        fontSize: 17,
+    },
     safeArea: {
         flex: 1,
         backgroundColor: "#FFF",

@@ -32,12 +32,12 @@ const Home = ({navigation}) => {
                    marginTop:25,
                    width:"100%"
                }}>
-                   <View style={{width:"50%"}}>
+                   <View style={{width:"70%"}}>
                         <Text style={{
-                            fontSize:28,
+                            fontSize:25,
                             color:"#FFF",
                             fontWeight:"bold"
-                        }}>Welcome to ArtTalk!</Text>
+                        }}>Start a ArtTalk Conversation!</Text>
                    </View>
                  
                </View>
@@ -136,8 +136,15 @@ const Home = ({navigation}) => {
                         }}
                     />
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Mona Lisa', artist: 'Leonardo Da Vinci', imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/1200px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg' } })}
-                        style={{
+                    onPress={() => navigation.navigate('Detailmodule', {
+                        artwork: {
+                        title: 'Mona Lisa',
+                        artist: 'Leonardo Da Vinci',
+                        description: 'The Mona Lisa is a world-renowned painting by Leonardo da Vinci and is considered an archetypal masterpiece of the Italian Renaissance. It features a portrait of a woman with an enigmatic expression.',
+                        imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/1200px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg'
+                        }
+                    })}                        
+                    style={{
                             height:300,
                             elevation:2,
                             backgroundColor:"#FFF",
@@ -320,7 +327,14 @@ const Home = ({navigation}) => {
                         }}
                     />
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Leonardo da Vinci', artist: 'Leonardo da Vinci', imageUri: 'https://www.worldhistory.org/img/r/p/500x600/12518.jpg?v=1691868603' } })}
+                        onPress={() => navigation.navigate('Detailmoduleartist', {
+                            artwork: {
+                                title: 'Leonardo da Vinci',
+                                artist: 'Leonardo da Vinci',
+                                description: 'Leonardo da Vinci was an Italian polymath whose areas of interest included invention, painting, sculpting, architecture, science, music, mathematics, engineering, literature, anatomy, geology, astronomy, botany, writing, history, and cartography.',
+                                imageUri: 'https://www.worldhistory.org/img/r/p/500x600/12518.jpg?v=1691868603'
+                            }
+                        })}                             
                         style={{
                             height:300,
                             elevation:2,
@@ -354,7 +368,14 @@ const Home = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Vincent van Gogh', artist: 'Vincent van Gogh', imageUri: 'https://hips.hearstapps.com/hmg-prod/images/vincent_van_gogh_self_portrait_painting_musee_dorsay_via_wikimedia_commons_promojpg.jpg' } })}
+                        onPress={() => navigation.navigate('Detailmoduleartist', {
+                            artwork: {
+                                title: 'Vincent van Gogh',
+                                artist: 'Vincent van Gogh',
+                                description: 'Vincent van Gogh was a Dutch post-impressionist painter who is among the most famous and influential figures in the history of Western art.',
+                                imageUri: 'https://hips.hearstapps.com/hmg-prod/images/vincent_van_gogh_self_portrait_painting_musee_dorsay_via_wikimedia_commons_promojpg.jpg'
+                            }
+                        })}                        
                         style={{
                             height:300,
                             elevation:2,
@@ -388,7 +409,14 @@ const Home = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Claude Monet', artist: 'Claude Monet', imageUri: 'https://www.myartprints.com/kunst/claude_monet/Selbstbildnis-mit-Barett.jpg' } })}
+                        onPress={() => navigation.navigate('Detailmoduleartist', {
+                            artwork: {
+                                title: 'Claude Monet',
+                                artist: 'Claude Monet',
+                                description: 'Claude Monet was a founder of French Impressionist painting, and the most consistent and prolific practitioner of the movement\'s philosophy of expressing one\'s perceptions before nature.',
+                                imageUri: 'https://www.myartprints.com/kunst/claude_monet/Selbstbildnis-mit-Barett.jpg'
+                            }
+                        })}                        
                         style={{
                             height:300,
                             elevation:2,
