@@ -3,7 +3,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createStackNavigator } from '@react-navigation/stack'
 import Home from '../screens/Home'
 import Detail from '../screens/Detail'
-import Favourite from '../screens/Favourite'
+import Detailmodule from '../screens/module_detail'
+import Detailmoduleartist from '../screens/module_detail copy'
+import Scan from '../screens/Scan'
 import Profile from '../screens/Profile'
 import {Image} from 'react-native'
 
@@ -28,22 +30,22 @@ const BottomTabNavigator = () => {
                     tabBarLabel:"",
                     tabBarIcon:({color, size}) => (
                         <Image
-                            source={require("../images/8.png")}
-                            style={{ height:20, width:20 }}
+                            source={require("../images/userhome.png")}
+                            style={{ height:25, width:25 }}
                         />
                     )
                 }}
             />
 
             <Tab.Screen
-                name="Favourite"
-                component={Favourite}
+                name="Scan"
+                component={Scan}
                 options={{
                     tabBarLabel:"",
                     tabBarIcon:({color, size}) => (
                         <Image
-                            source={require("../images/9.png")}
-                            style={{ height:20, width:20 }}
+                            source={require("../images/scan.png")}
+                            style={{ height:25, width:25 }}
                         />
                     )
                 }}
@@ -55,8 +57,8 @@ const BottomTabNavigator = () => {
                     tabBarLabel:"",
                     tabBarIcon:({color, size}) => (
                         <Image
-                            source={require("../images/10.png")}
-                            style={{ height:20, width:20 }}
+                            source={require("../images/person.png")}
+                            style={{ height:25, width:25 }}
                         />
                     )
                 }}
@@ -76,6 +78,9 @@ const HomeStackNavigator = () => {
         <Stack.Navigator screenOptions={screenOptionStyle}>
             <Stack.Screen name="Home" component={BottomTabNavigator}/>
             <Stack.Screen name="Detail" component={Detail}/>
+            <Stack.Screen name="Detailmodule" component={Detailmodule}/>
+            <Stack.Screen name="Detailmoduleartist" component={Detailmoduleartist}/>
+
         </Stack.Navigator>
     )
 }

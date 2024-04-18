@@ -7,7 +7,7 @@ const Home = ({navigation}) => {
     return(
         <ScrollView style={{ backgroundColor: '#FFF', flex: 1 }}>
 
-        <View style={{
+        <ScrollView style={{
             backgroundColor:"#FFF",
             flex:1
         }}>
@@ -136,7 +136,7 @@ const Home = ({navigation}) => {
                         }}
                     />
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate("Detail")}
+                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Mona Lisa', artist: 'Leonardo Da Vinci', imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/1200px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -176,8 +176,8 @@ const Home = ({navigation}) => {
                         </Text>
                     </TouchableOpacity>
 
-                    <View 
-                        onPress={()=>navigation.navigate("Detail")}
+                    <TouchableOpacity 
+                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Starry Night', artist: 'Vincent van Gogh', imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -215,10 +215,10 @@ const Home = ({navigation}) => {
                         }}>
                             Vincent van Gogh
                         </Text>
-                    </View>
+                    </TouchableOpacity>
 
-                    <View 
-                         onPress={()=>navigation.navigate("Detail")}
+                    <TouchableOpacity 
+                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Water Lilies and the Japanese bridge', artist: 'Claude Monet', imageUri: 'https://puam-loris.aws.princeton.edu/loris/y1972-15.jp2/full/!1200,630/0/default.jpg' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -256,7 +256,7 @@ const Home = ({navigation}) => {
                         }}>
                             Claude Monet
                         </Text>
-                    </View>
+                    </TouchableOpacity>
 
                 </ScrollView>            
 
@@ -320,7 +320,7 @@ const Home = ({navigation}) => {
                         }}
                     />
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate("Detail")}
+                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Leonardo da Vinci', artist: 'Leonardo da Vinci', imageUri: 'https://www.worldhistory.org/img/r/p/500x600/12518.jpg?v=1691868603' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -333,7 +333,7 @@ const Home = ({navigation}) => {
                         }}
                     >
                         <Image
-                            source={require('../images/12518.jpg')}
+                            source={require('../images/davinci.jpg')}
                             style={{
                                 height: 200, // set the height you want
                                 width: '100%', // set the width you want
@@ -353,8 +353,8 @@ const Home = ({navigation}) => {
                        
                     </TouchableOpacity>
 
-                    <View 
-                        onPress={()=>navigation.navigate("Detail")}
+                    <TouchableOpacity 
+                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Vincent van Gogh', artist: 'Vincent van Gogh', imageUri: 'https://hips.hearstapps.com/hmg-prod/images/vincent_van_gogh_self_portrait_painting_musee_dorsay_via_wikimedia_commons_promojpg.jpg' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -385,10 +385,10 @@ const Home = ({navigation}) => {
                            
                         </View>
                         
-                    </View>
+                    </TouchableOpacity>
 
-                    <View 
-                         onPress={()=>navigation.navigate("Detail")}
+                    <TouchableOpacity 
+                        onPress={()=>navigation.navigate('Detailmoduleartist', { artwork: { title: 'Claude Monet', artist: 'Claude Monet', imageUri: 'https://www.myartprints.com/kunst/claude_monet/Selbstbildnis-mit-Barett.jpg' } })}
                         style={{
                             height:300,
                             elevation:2,
@@ -419,11 +419,11 @@ const Home = ({navigation}) => {
                             
                         </View>
                         
-                    </View>
+                    </TouchableOpacity>
 
                 </ScrollView>                    
               
-        </View>
+        </ScrollView>
         </ScrollView>
 
     )
