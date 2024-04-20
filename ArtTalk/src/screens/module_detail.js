@@ -1,11 +1,25 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView,Dimensions } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, TextInput, Dimensions, FlatList } from 'react-native';
+
 const screenWidth = Dimensions.get('window').width;
 
 
 const Detailmodule = ({ navigation, route }) => {
     const { artwork } = route.params;
+    const [showDescription, setShowDescription] = useState(false); // State to toggle description
+    const [isChatVisible, setIsChatVisible] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [inputText, setInputText] = useState('');
+
+    const handleSendMessage = () => {
+        if (inputText.trim() === '') return;
+
+        // Add new message to the messages array
+        setMessages([...messages, { id: Date.now(), text: inputText }]);
+
+        // Clear the input field
+        setInputText('');
+    };
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -28,20 +42,69 @@ const Detailmodule = ({ navigation, route }) => {
                 <Text style={styles.artist}>
                     {artwork.artist}
                 </Text>
+                {showDescription && (
+                    <View style={styles.descriptionContainer}>
+                        <Text style={styles.description}>
+                            {artwork.description}
+                        </Text>
+                    </View>
+                )}
+                
             </ScrollView>
+            
+            {isChatVisible && (
+                <View style={styles.chatContainer}>
+                    <FlatList
+                        data={messages}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <View style={styles.messageBubble}>
+                                <Text style={styles.messageText}>{item.text}</Text>
+                            </View>
+                        )}
+                    />
+                    <View style={styles.inputContainer}>
+                        <TextInput
+                            style={styles.input}
+                            value={inputText}
+                            onChangeText={setInputText}
+                            placeholder="Type your message..."
+                        />
+                        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+                            <Text style={styles.sendButtonText}>Send</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            )}
             <View style={styles.actionContainer}>
-                <TouchableOpacity style={styles.chatButton}>
+                <TouchableOpacity style={styles.chatButton} onPress={() => setIsChatVisible(!isChatVisible)}>
                     <Text style={styles.chatButtonText}>Chat with AI</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.descriptionButton}>
+                <TouchableOpacity style={styles.descriptionButton} onPress={() => {
+                    setShowDescription(!showDescription);
+                }}>
                     <Text style={styles.descriptionButtonText}>Description</Text>
                 </TouchableOpacity>
             </View>
+            
         </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    descriptionContainer: {
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+    },
+    description: {
+        fontSize: 16,
+        color: "#62636a",
+    },
+    descriptionButtonText: {
+        color: "#00a46c",
+        fontWeight: "bold",
+        fontSize: 17,
+    },
     safeArea: {
         flex: 1,
         backgroundColor: "#FFF",
@@ -109,7 +172,44 @@ const styles = StyleSheet.create({
         color: "#62636a",
         fontWeight: "bold",
         fontSize: 17,
-    }
+    },
+    chatContainer: {
+        paddingHorizontal: 10,
+        paddingBottom: 20,
+    },
+    messageBubble: {
+        backgroundColor: '#f0f0f0',
+        padding: 10,
+        borderRadius: 20,
+        marginTop: 10,
+        maxWidth: '80%',
+        alignSelf: 'flex-end',
+    },
+    messageText: {
+        fontSize: 16,
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 25,
+        padding: 10,
+        flex: 1,
+        marginRight: 10,
+    },
+    sendButton: {
+        backgroundColor: '#00a46c',
+        borderRadius: 25,
+        padding: 10,
+    },
+    sendButtonText: {
+        color: '#FFF',
+        fontSize: 16,
+    },
 });
 
 export default Detailmodule;

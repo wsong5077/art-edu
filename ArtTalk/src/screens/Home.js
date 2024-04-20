@@ -184,8 +184,15 @@ const Home = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Starry Night', artist: 'Vincent van Gogh', imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg' } })}
-                        style={{
+                            onPress={() => navigation.navigate('Detailmodule', {
+                                artwork: {
+                                    title: 'Starry Night',
+                                    artist: 'Vincent van Gogh',
+                                    description: 'Starry Night is one of Vincent van Gogh\'s most famous works and depicts the view from the east-facing window of his asylum room at Saint-Rémy-de-Provence, just before sunrise, with the addition of an idealized village.',
+                                    imageUri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg'
+                                }
+                            })}                        
+                            style={{
                             height:300,
                             elevation:2,
                             backgroundColor:"#FFF",
@@ -225,7 +232,14 @@ const Home = ({navigation}) => {
                     </TouchableOpacity>
 
                     <TouchableOpacity 
-                        onPress={()=>navigation.navigate('Detailmodule', { artwork: { title: 'Water Lilies and the Japanese bridge', artist: 'Claude Monet', imageUri: 'https://puam-loris.aws.princeton.edu/loris/y1972-15.jp2/full/!1200,630/0/default.jpg' } })}
+                        onPress={() => navigation.navigate('Detailmodule', {
+                            artwork: {
+                                title: 'Water Lilies and the Japanese Bridge',
+                                artist: 'Claude Monet',
+                                description: 'Water Lilies and Japanese Bridge represents two of Monet\'s greatest achievements: his gardens at Giverny and the paintings they inspired. Monet painted the subject in 1899 and it became a continuous focus for him thereafter.',
+                                imageUri: 'https://puam-loris.aws.princeton.edu/loris/y1972-15.jp2/full/!1200,630/0/default.jpg'
+                            }
+                        })}                        
                         style={{
                             height:300,
                             elevation:2,
