@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, TextInput, Dimensions, FlatList } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
+
+import axios from 'axios';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -10,20 +12,66 @@ const Detailmodule = ({ navigation, route }) => {
     const [isChatVisible, setIsChatVisible] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
+    const flatListRef = useRef(); // Ref for FlatList to control scroll position
 
-    const handleSendMessage = () => {
+    useEffect(() => {
+        if (isChatVisible && messages.length) {
+            // Scroll to the bottom of the list when new messages are added
+            flatListRef.current.scrollToEnd({ animated: true });
+        }
+    }, [messages, isChatVisible]); // Dependency array includes messages and isChatVisible
+
+    const toggleChatVisibility = () => {
+        setIsChatVisible(!isChatVisible);
+        console.log(showDescription);
+        setShowDescription(false);
+        if (isChatVisible) {
+            setShowDescription(false);
+            console.log(showDescription);
+        }
+    };
+
+    const toggleDescriptionVisibility = () => {
+        setShowDescription(!showDescription);
+        if (showDescription) {
+            setIsChatVisible(false);
+        }
+    };
+
+    const handleSendMessage = async () => {
         if (inputText.trim() === '') return;
-
-        // Add new message to the messages array
-        setMessages([...messages, { id: Date.now(), text: inputText }]);
-
+    
+        // Construct the message object for the local chat display
+        const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
+    
+        // Add the user's message to the chat interface
+        setMessages(messages => [...messages, messageToSend]);
+    
+        try {
+            // Send the message to your server and await the response
+            const response = await axios.post('http://0.0.0.0:8000/chat/', {
+                question: inputText
+            });
+    
+            // Add the chatbot's response to the chat interface
+            if (response.data && response.data.response) {
+                setMessages(messages => [
+                    ...messages,
+                    { id: Date.now(), text: response.data.response, owner: 'bot' }
+                ]);
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            // Optionally handle errors, e.g., show an error message in the UI
+        }
+    
         // Clear the input field
         setInputText('');
     };
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <ScrollView style={styles.container}>
+            <View style={styles.container}>
                 <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
                     <Image
                         source={require('../images/17.png')}
@@ -42,27 +90,32 @@ const Detailmodule = ({ navigation, route }) => {
                 <Text style={styles.artist}>
                     {artwork.artist}
                 </Text>
-                {showDescription && (
+               
+            <ScrollView style={{ backgroundColor: '#FFF', flex: 1 }}>
+            {showDescription && (
                     <View style={styles.descriptionContainer}>
                         <Text style={styles.description}>
                             {artwork.description}
                         </Text>
                     </View>
                 )}
-                
-            </ScrollView>
-            
             {isChatVisible && (
-                <View style={styles.chatContainer}>
                     <FlatList
+                        ref={flatListRef}
                         data={messages}
                         keyExtractor={(item) => item.id.toString()}
                         renderItem={({ item }) => (
-                            <View style={styles.messageBubble}>
+                            <View style={[styles.messageBubble, item.owner === 'bot' ? styles.botMessage : styles.userMessage]}>
                                 <Text style={styles.messageText}>{item.text}</Text>
                             </View>
                         )}
+                        style={styles.chatContainer}
                     />
+                )}
+                
+            </ScrollView>
+            </View>
+            {isChatVisible && (
                     <View style={styles.inputContainer}>
                         <TextInput
                             style={styles.input}
@@ -74,18 +127,17 @@ const Detailmodule = ({ navigation, route }) => {
                             <Text style={styles.sendButtonText}>Send</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-            )}
+                )}
             <View style={styles.actionContainer}>
-                <TouchableOpacity style={styles.chatButton} onPress={() => setIsChatVisible(!isChatVisible)}>
+                <TouchableOpacity style={styles.chatButton} onPress={toggleChatVisibility}>
                     <Text style={styles.chatButtonText}>Chat with AI</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.descriptionButton} onPress={() => {
-                    setShowDescription(!showDescription);
-                }}>
+                <TouchableOpacity style={styles.descriptionButton} onPress={toggleDescriptionVisibility}>
                     <Text style={styles.descriptionButtonText}>Description</Text>
                 </TouchableOpacity>
             </View>
+            
+            
             
         </SafeAreaView>
     );
@@ -129,7 +181,7 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         flexDirection: "row",
-        marginTop: -100,
+        marginTop: -120,
         marginHorizontal: 20,
         alignItems: "center",
     },
@@ -192,6 +244,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 10,
+        marginBottom:10
     },
     input: {
         borderWidth: 1,
@@ -210,6 +263,15 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontSize: 16,
     },
+    botMessage: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#d1e7dd',  // A light green background for bot messages
+    },
+    userMessage: {
+        alignSelf: 'flex-end',
+        backgroundColor: '#f0f0f0',  // A light grey background for user messages
+    }
+    
 });
 
 export default Detailmodule;

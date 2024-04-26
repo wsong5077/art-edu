@@ -113,7 +113,7 @@ const Scan = () => {
     formData.append('file', blob, 'image.jpg');
     
     try {
-      const response = await fetch('http://127.0.0.1:5000/predict', {
+      const response = await fetch('http://127.0.0.1:5000/recognize', {
         method: 'POST',
         body: formData,
       });
@@ -149,6 +149,9 @@ const Scan = () => {
     <View style={styles.container}>
       <Camera style={styles.camera} ref={ref => setCameraRef(ref)} />
       <View style={styles.buttonContainer}>
+            <TouchableOpacity onPress={takePicture} style={styles.docscanButton}>
+                <MaterialIcons name="document-scanner" size={36} color="#fff" />
+            </TouchableOpacity>
             <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
                 <MaterialIcons name="camera" size={36} color="#fff" />
             </TouchableOpacity>
@@ -291,6 +294,11 @@ captureButton: { // Capture button centered
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
+},
+docscanButton:{
+  flexGrow: 0,
+  alignItems: 'flex-start',
+  justifyContent: 'center',
 },
 uploadButton: { // Upload button right
     flexGrow: 0,
