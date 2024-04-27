@@ -43,9 +43,12 @@ const Detailmodule = ({ navigation, route }) => {
     
         // Construct the message object for the local chat display
         const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
+        console.log(messageToSend);
     
         // Add the user's message to the chat interface
         setMessages(messages => [...messages, messageToSend]);
+        console.log(messages);
+
     
         try {
             // Send the message to your server and await the response

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
+
 import { View, StyleSheet, Image, TouchableOpacity, Text, Modal, Button, TextInput, FlatList, Alert, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
-
+import axios from 'axios';
 const classDescriptions = {
     'Rococo': 'An 18th-century artistic movement and style.',
     'Expressionism': 'A modernist movement focusing on emotional experience rather than appearances.',
@@ -44,174 +45,238 @@ const classDescriptions = {
   };
   
 
-const Scan = () => {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [cameraRef, setCameraRef] = useState(null);
-  const [photo, setPhoto] = useState(null);
-  const [photoModalVisible, setPhotoModalVisible] = useState(false);
-  const [chatModalVisible, setChatModalVisible] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [inputText, setInputText] = useState('');
 
+  
+  const Scan = () => {
+    const [hasPermission, setHasPermission] = useState(null);
+    const [cameraRef, setCameraRef] = useState(null);
+    const [firstPhoto, setFirstPhoto] = useState(null);
+    const [secondPhoto, setSecondPhoto] = useState(null);
+    const [photoModalVisible, setPhotoModalVisible] = useState(false);
+    const [decisionModalVisible, setDecisionModalVisible] = useState(false);
+    const [chatModalVisible, setChatModalVisible] = useState(false);
+    const [messages, setMessages] = useState([]);
+    const [inputText, setInputText] = useState('');
+    const flatListRef = useRef(); // Ref for FlatList to control scroll position
 
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-      if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        
-        if (status !== 'granted') {
-          alert('Sorry, we need camera roll permissions to make this work!');
+  
+    useEffect(() => {
+      (async () => {
+        const cameraStatus = await Camera.requestCameraPermissionsAsync();
+        setHasPermission(cameraStatus.status === 'granted');
+        if (Platform.OS !== 'web') {
+          const libraryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (libraryStatus.status !== 'granted') {
+            alert('Sorry, we need camera roll permissions to make this work!');
+          }
         }
+      })();
+    }, []);
+  
+    const takePicture = async () => {
+      if (cameraRef) {
+        const photo = await cameraRef.takePictureAsync();
+        setFirstPhoto(photo['assets'][0]);
+        //console.log(firstPhoto);
+        setPhotoModalVisible(true);
       }
-    })();
-  }, []);
-
-  const takePicture = async () => {
-    if (cameraRef) {
-      let photo = await cameraRef.takePictureAsync();
-      setPhoto(photo);
-      setPhotoModalVisible(true); // Show modal with the photo
-    }
-  };
-
-  const pickImage = async () => {
-    let photo = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    console.log(photo['assets'][0]);
-
-    if (!photo.canceled) {
-      setPhoto(photo['assets'][0]);
-      setPhotoModalVisible(true);
-    }else {
-        alert('You did not select any image.');
     };
-  };
-
-
-
-  const handleSendPhoto = async () => {
-    if (!photo) {
-      alert('No image to convert');
-      return;
-    }
-
-    const manipResult = await manipulateAsync(
-      photo.localUri || photo.uri,
-      [],
-      { compress: 1, format: SaveFormat.JPEG }
-    );
-    
-    const formData = new FormData();
-    const fetchResponse = await fetch(manipResult.uri);
-    const blob = await fetchResponse.blob();
-    formData.append('file', blob, 'image.jpg');
-    
-    try {
-      const response = await fetch('http://127.0.0.1:5000/recognize', {
-        method: 'POST',
-        body: formData,
+  
+    const pickImage = async () => {
+      const photo = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
       });
-
-      if (response.ok) {
-        const result = await response.json();
-        const classPrediction = result.class;
-        const description = classDescriptions[classPrediction] || "No description available for this class.";
-        setMessages([{ id: Date.now(), text: `This piece of artwork is likely to be ${classPrediction}. ${description}` }]);
-        setChatModalVisible(true);
+      if (!photo.canceled) {
+        //console.log(photo['assets'][0]);
+        setFirstPhoto(photo['assets'][0]);
+        //console.log(firstPhoto);
+        setPhotoModalVisible(true);
       } else {
-        throw new Error(`Server responded with status: ${response.status}`);
+        alert('You did not select any image.');
       }
+    };
+  
+    const handleDecision = async (option) => {
+      if (option === 'add') {
+        // Assuming adding a second photo should open the picker again
+        const second = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+          quality: 1,
+        });
+        if (!second.canceled) {
+          setSecondPhoto(second['assets'][0]);
+          setDecisionModalVisible(false);
+          // Process both photos
+          await processPhotos(firstPhoto, secondPhoto);
+        } else {
+          alert('No second image selected, processing first image only.');
+          await processPhotos(firstPhoto, null);
+        }
+      } else {
+        // Process only the first photo
+        await processPhotos(firstPhoto, null);
+      }
+    };
+  
+    const processPhotos = async (first, second) => {
+      let artResponse, artResult, ocrResponse, ocrResult = { text: '' };
+  
+      const firstFormData = new FormData();
+      const firstFetchResponse = await fetch(first.uri);
+      const firstBlob = await firstFetchResponse.blob();
+      firstFormData.append('file', firstBlob, 'firstImage.jpg');
+  
+      try {
+          // Send the first photo to the art identification server
+          artResponse = await fetch('http://127.0.0.1:5001/predict', {
+            method: 'POST',
+            body: firstFormData,
+          });
+  
+          if (artResponse.ok) {
+              artResult = await artResponse.json(); // Ensure this is only called once per response
+          } else {
+              throw new Error(`Art API responded with status: ${artResponse.status}`);
+          }
+  
+          if (second) {
+              const secondFormData = new FormData();
+              const secondFetchResponse = await fetch(second.uri);
+              const secondBlob = await secondFetchResponse.blob();
+              secondFormData.append('file', secondBlob, 'secondImage.jpg');
+  
+              // Send the second photo to the OCR server
+              ocrResponse = await fetch('http://127.0.0.1:5000/recognize', {
+                  method: 'POST',
+                  body: secondFormData,
+              });
+  
+              if (ocrResponse.ok) {
+                  ocrResult = await ocrResponse.json(); // Ensure this is only called once per response
+              } else {
+                  throw new Error(`OCR API responded with status: ${ocrResponse.status}`);
+              }
+          }
+  
+          // Prepare messages to display
+          const artDescription = classDescriptions[artResult.class] || "No description available for this class.";
+          const artMessage = `Art Style: ${artResult.class}. ${artDescription}`;
+          const ocrMessage = second ? `Recognized Text: ${ocrResult.text}` : '';
+          setMessages([{ id: Date.now(), text: `${artMessage}\n${ocrMessage}` }]);
+          setChatModalVisible(true);
+      } catch (error) {
+          console.error('Error:', error);
+          alert('Error processing images: ' + error.message);
+      } finally {
+          setPhotoModalVisible(false);
+      }
+  };
+  
+  
+  const handleSendMessage = async () => {
+    if (inputText.trim() === '') return;
+
+    const lastMessage = messages.length > 0 ? messages[messages.length - 1].text : '';
+
+    const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
+    setMessages(messages => [...messages, messageToSend]);
+
+    try {
+        const response = await axios.post('http://0.0.0.0:8000/chat/', {
+            question: inputText,
+            context: lastMessage  // Sending the last message which includes art and OCR results
+        });
+
+        if (response.data && response.data.response) {
+            setMessages(messages => [
+                ...messages,
+                { id: Date.now(), text: response.data.response, owner: 'bot' }
+            ]);
+        }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error sending image: ' + error.message);
+        console.error('Error sending message:', error);
     }
 
-    setPhotoModalVisible(false);
-  };
-
-  const handleSendMessage = () => {
-    const newMessages = [...messages, { id: Date.now(), text: inputText }];
-    setMessages(newMessages);
     setInputText('');
-  };
-
-  const handleCloseChat = () => {
-    setChatModalVisible(false);
-  };
-
-  return (
-    <View style={styles.container}>
-      <Camera style={styles.camera} ref={ref => setCameraRef(ref)} />
-      <View style={styles.buttonContainer}>
-            <TouchableOpacity onPress={takePicture} style={styles.docscanButton}>
-                <MaterialIcons name="document-scanner" size={36} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
-                <MaterialIcons name="camera" size={36} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
-                <MaterialIcons name="photo-library" size={36} color="#fff" />
-            </TouchableOpacity>
-        </View>
-
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={photoModalVisible}
-        onRequestClose={() => {
-          Alert.alert("Modal has been closed.");
-          setPhotoModalVisible(!photoModalVisible);
-        }}
-      >
-        <View style={styles.centeredView}>
-          <Image source={{ uri: photo?.uri }} style={styles.modalImage} />
-          <Text style={styles.modalText}>Do you want to retake or use this photo?</Text>
-          <View style={styles.buttonContainer}>
-            <Button title="Retake" style={styles.retakeButton} onPress={() => setPhotoModalVisible(!photoModalVisible)} />
-            <Button title="Chat with AI" style={styles.aiButton} onPress={handleSendPhoto} />
-          </View>
-        </View>
-      </Modal>
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={chatModalVisible}
-        onRequestClose={handleCloseChat}
-      >
-        <View style={styles.chatContainer}>
-          <FlatList
-            data={messages}
-            keyExtractor={item => item.id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.messageBubble}>
-                <Text style={styles.messageText}>{item.text}</Text>
-              </View>
-            )}
-          />
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              value={inputText}
-              onChangeText={setInputText}
-              placeholder="Type your message..."
-            />
-            <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-              <Text style={styles.sendButtonText}>Send</Text>
-            </TouchableOpacity>
-          </View>
-          <Button title="Close Chat" style={styles.closeButton} onPress={handleCloseChat} />
-        </View>
-      </Modal>
-    </View>
-  );
 };
+
+
+  
+    const handleCloseChat = () => {
+      setChatModalVisible(false);
+    };
+  
+    return (
+      <View style={styles.container}>
+        <Camera style={styles.camera} ref={setCameraRef} />
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
+            <MaterialIcons name="camera" size={36} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={pickImage} style={styles.uploadButton}>
+            <MaterialIcons name="photo-library" size={36} color="#fff" />
+          </TouchableOpacity>
+        </View>
+  
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={photoModalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setPhotoModalVisible(!photoModalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <Image source={{ uri: firstPhoto?.uri }} style={styles.modalImage} />
+            <Text style={styles.modalText}>What would you like to do with this photo?</Text>
+            <Button title="Add another photo" onPress={() => handleDecision('add')} />
+            <Button title="Start chat with this photo" onPress={() => handleDecision('chat')} />
+            <Button title="Retake" onPress={() => setPhotoModalVisible(false)} />
+          </View>
+        </Modal>
+  
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={chatModalVisible}
+          onRequestClose={handleCloseChat}
+        >
+          <View style={styles.chatContainer}>
+          <FlatList
+                        ref={flatListRef}
+                        data={messages}
+                        keyExtractor={(item) => item.id.toString()}
+                        renderItem={({ item }) => (
+                            <View style={[styles.messageBubble, item.owner === 'bot' ? styles.botMessage : styles.userMessage]}>
+                                <Text style={styles.messageText}>{item.text}</Text>
+                            </View>
+                        )}
+                        style={styles.chatContainer}
+                    />
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder="Type your message..."
+              />
+              <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+                <Text style={styles.sendButtonText}>Send</Text>
+              </TouchableOpacity>
+            </View>
+            <Button title="Close Chat" style={styles.closeButton} onPress={handleCloseChat} />
+          </View>
+        </Modal>
+      </View>
+    );
+  };
+  
 
 const styles = StyleSheet.create({
   container: {
@@ -321,6 +386,14 @@ aiButton: {
     width: 200,
     height: 200,
   },
+  botMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#d1e7dd',  // A light green background for bot messages
+},
+userMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#f0f0f0',  // A light grey background for user messages
+}
 });
 
 export default Scan;
