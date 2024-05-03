@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Button } from 'react-native';
-import { useAuth } from './AuthContext'; // If AuthContext is in the same directory
+import { useAuth } from './AuthContext'; 
 
 const Profile = ({ navigation }) => {
     const { isAuthenticated, setAuthenticated } = useAuth();

@@ -2,7 +2,6 @@ import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { createStackNavigator } from '@react-navigation/stack'
 import Home from '../screens/Home'
-import Detail from '../screens/Detail'
 import Detailmodule from '../screens/module_detail'
 import Detailmoduleartist from '../screens/module_detail copy'
 import Scan from '../screens/Scan'
@@ -79,7 +78,6 @@ const HomeStackNavigator = () => {
     return(
         <Stack.Navigator screenOptions={screenOptionStyle}>
             <Stack.Screen name="Home" component={BottomTabNavigator}/>
-            <Stack.Screen name="Detail" component={Detail}/>
             <Stack.Screen name="Detailmodule" component={Detailmodule}/>
             <Stack.Screen name="Detailmoduleartist" component={Detailmoduleartist}/>
             <Stack.Screen name="Login" component={LoginScreen} />

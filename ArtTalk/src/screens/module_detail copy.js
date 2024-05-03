@@ -9,7 +9,11 @@ const Detailmoduleartist = ({ navigation, route }) => {
     const [isChatVisible, setIsChatVisible] = useState(false);
     const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
-    
+    const images = {
+        vinci: require('../images/davinci.jpg'),
+        van:require('../images/van.jpeg'),
+        monet:require('../images/monet.jpg'),
+    };
     const handleSendMessage = () => {
         if (inputText.trim() === '') return;
 
@@ -31,7 +35,7 @@ const Detailmoduleartist = ({ navigation, route }) => {
                         />
                     </TouchableOpacity>
                     <Image
-                        source={{ uri: artwork.imageUri }}
+                        source={images[artwork.localImage]}
                         style={styles.artworkImage}
                     />
                 <View style={styles.titleContainer}>

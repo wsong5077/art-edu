@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    paddingHorizontal: 20,
+    //paddingHorizontal: 20,
     paddingBottom: 20,
     paddingTop:20,
     justifyContent: 'center',
@@ -359,6 +359,7 @@ captureButton: { // Capture button centered
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft:35
 },
 docscanButton:{
   flexGrow: 0,
@@ -374,7 +375,7 @@ retakeButton: {
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight:20
+    //marginRight:20
 },
 aiButton: { 
     flexGrow: 0,

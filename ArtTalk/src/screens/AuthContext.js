@@ -7,9 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
 
   const loginUser = (email, password) => {
-    // Here you would integrate with your backend to authenticate the user
-    // and retrieve user info, then store it in the context
-    const userData = { email }; // Replace with actual user data
+    const userData = { email }; 
     setUserInfo(userData);
     setAuthenticated(true);
   };

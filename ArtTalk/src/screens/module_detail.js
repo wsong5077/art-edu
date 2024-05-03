@@ -7,6 +7,13 @@ const screenWidth = Dimensions.get('window').width;
 
 
 const Detailmodule = ({ navigation, route }) => {
+    // Predefine imports for all images
+    const images = {
+        monalisa: require('../images/monalisa.jpg'),
+        starry:require('../images/starry.jpg'),
+        lilly:require('../images/Monet1.jpg'),
+    };
+  
     const { artwork } = route.params;
     const [showDescription, setShowDescription] = useState(false); // State to toggle description
     const [isChatVisible, setIsChatVisible] = useState(false);
@@ -40,23 +47,19 @@ const Detailmodule = ({ navigation, route }) => {
 
     const handleSendMessage = async () => {
         if (inputText.trim() === '') return;
-    
-        // Construct the message object for the local chat display
-        const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
-        console.log(messageToSend);
-    
-        // Add the user's message to the chat interface
-        setMessages(messages => [...messages, messageToSend]);
-        console.log(messages);
+        const context = `Discussing: ${artwork.title} by ${artwork.artist}.`;
 
+        //const lastMessage = messages.length > 0 ? messages[messages.length - 1].text : '';
+    
+        const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
+        setMessages(messages => [...messages, messageToSend]);
     
         try {
-            // Send the message to your server and await the response
             const response = await axios.post('http://0.0.0.0:8000/chat/', {
-                question: inputText
+                question: inputText,
+                context: context  // Sending the last message which includes art and OCR results
             });
     
-            // Add the chatbot's response to the chat interface
             if (response.data && response.data.response) {
                 setMessages(messages => [
                     ...messages,
@@ -65,10 +68,8 @@ const Detailmodule = ({ navigation, route }) => {
             }
         } catch (error) {
             console.error('Error sending message:', error);
-            // Optionally handle errors, e.g., show an error message in the UI
         }
     
-        // Clear the input field
         setInputText('');
     };
 
@@ -82,7 +83,7 @@ const Detailmodule = ({ navigation, route }) => {
                     />
                 </TouchableOpacity>
                 <Image
-                    source={{ uri: artwork.imageUri }}
+                    source={images[artwork.localImage]}
                     style={styles.artworkImage}
                 />
                 <View style={styles.titleContainer}>

@@ -12,9 +12,7 @@ const SignupScreen = () => {
   const navigation = useNavigation();
 
   const handleSignup = () => {
-    // Replace this logic with your actual signup process
-    // For example, sending email and password to your backend
-    // and handling the response.
+    
     loginUser(email, password); // Store user info and set authenticated
     navigation.navigate('Home'); // Redirect to home after signup
   };
@@ -50,6 +48,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     padding: 20,
+    alignItems: 'center',
+
   },
   title: {
     fontSize: 24,
