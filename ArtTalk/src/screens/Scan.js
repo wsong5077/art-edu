@@ -76,7 +76,8 @@ const classDescriptions = {
     const takePicture = async () => {
       if (cameraRef) {
         const photo = await cameraRef.takePictureAsync();
-        setFirstPhoto(photo['assets'][0]);
+        console.log(photo);
+        setFirstPhoto(photo);
         //console.log(firstPhoto);
         setPhotoModalVisible(true);
       }
@@ -89,10 +90,11 @@ const classDescriptions = {
         aspect: [4, 3],
         quality: 1,
       });
+      console.log(photo);
       if (!photo.canceled) {
         //console.log(photo['assets'][0]);
         setFirstPhoto(photo['assets'][0]);
-        //console.log(firstPhoto);
+        console.log(photo['assets'][0]);
         setPhotoModalVisible(true);
       } else {
         alert('You did not select any image.');
@@ -124,58 +126,94 @@ const classDescriptions = {
     };
   
     const processPhotos = async (first, second) => {
-      let artResponse, artResult, ocrResponse, ocrResult = { text: '' };
-  
+      const manipResult = await manipulateAsync(
+        first.localUri || first.uri,
+        [],
+        { compress: 1, format: SaveFormat.JPEG }
+      );
+ 
       const firstFormData = new FormData();
-      const firstFetchResponse = await fetch(first.uri);
-      const firstBlob = await firstFetchResponse.blob();
-      firstFormData.append('file', firstBlob, 'firstImage.jpg');
-  
+      const firstFetchResponse = await fetch(manipResult.uri);
+      const blob = await firstFetchResponse.blob();
+      firstFormData.append('file', blob, 'image.jpg');
+      
+      console.log(firstFetchResponse);
       try {
-          // Send the first photo to the art identification server
-          artResponse = await fetch('http://127.0.0.1:5001/predict', {
-            method: 'POST',
-            body: firstFormData,
-          });
+          // Simultaneous requests to both servers
+          const artServerUrl5003 = 'http://127.0.0.1:5003/predict';
+          const artServerUrl5001 = 'http://127.0.0.1:5001/predict';
+          const requests = [
+              fetch(artServerUrl5003, {
+                  method: 'POST',
+                  
+                  body: firstFormData,
+              }),
+              fetch(artServerUrl5001, {
+                  method: 'POST',
+                  
+                  body: firstFormData,
+              })
+          ];
   
-          if (artResponse.ok) {
-              artResult = await artResponse.json(); // Ensure this is only called once per response
-          } else {
-              throw new Error(`Art API responded with status: ${artResponse.status}`);
-          }
+          const responses = await Promise.all(requests);
+          console.log(responses);
+          const results = await Promise.all(responses.map(res => res.json()));
+  
+          const artResult5003 = results[0];
+          const artResult5001 = results[1];
+  
+          console.log('Response from server 5003:', artResult5003);
+          console.log('Response from server 5001:', artResult5001);
   
           if (second) {
               const secondFormData = new FormData();
-              const secondFetchResponse = await fetch(second.uri);
-              const secondBlob = await secondFetchResponse.blob();
+              const secondBlob = await (await fetch(second.uri)).blob();
               secondFormData.append('file', secondBlob, 'secondImage.jpg');
   
-              // Send the second photo to the OCR server
-              ocrResponse = await fetch('http://127.0.0.1:5000/recognize', {
+              const ocrResponse = await fetch('http://127.0.0.1:5000/recognize', {
                   method: 'POST',
+                 
                   body: secondFormData,
               });
   
-              if (ocrResponse.ok) {
-                  ocrResult = await ocrResponse.json(); // Ensure this is only called once per response
-              } else {
-                  throw new Error(`OCR API responded with status: ${ocrResponse.status}`);
-              }
-          }
+              const ocrResult = await ocrResponse.json();
+              console.log('OCR result:', ocrResult);
+              updateUI(artResult5003, artResult5001, ocrResult);
+
+          } else{updateUI(artResult5003, artResult5001, second ? ocrResult : undefined)}
   
-          // Prepare messages to display
-          const artDescription = classDescriptions[artResult.class] || "No description available for this class.";
-          const artMessage = `Art Style: ${artResult.class}. ${artDescription}`;
-          const ocrMessage = second ? `Recognized Text: ${ocrResult.text}` : '';
-          setMessages([{ id: Date.now(), text: `${artMessage}\n${ocrMessage}` }]);
-          setChatModalVisible(true);
+          
       } catch (error) {
-          console.error('Error:', error);
+          console.error('Error processing images:', error);
           alert('Error processing images: ' + error.message);
-      } finally {
-          setPhotoModalVisible(false);
       }
   };
+  
+  const updateUI = (artResult5003, artResult5001, ocrResult) => {
+      console.log(artResult5003);
+      console.log(artResult5001);
+      const message5003 = `This artwork is likely to be: ${artResult5003.title}`;
+      const artDescription = classDescriptions[artResult5001.class] || "No description available for this class.";
+      const artMessage = `The style is likely to be: ${artResult5001.class}. ${artDescription}`;
+      if (ocrResult){
+        console.log(ocrResult);
+        const ocrMessage = ocrResult ? `OCR Text: ${ocrResult.text}` : 'You can scan the text description to get more accurate response.';
+        setMessages([{ id: Date.now(), text: `${message5003}\n${artMessage}\n${ocrMessage}` }]);
+
+      }else{
+        console.log(ocrResult);
+
+        const ocrMessage = ocrResult ? `OCR Text: ${ocrResult.text}` : 'You can scan the text description to get more accurate response.';
+        setMessages([{ id: Date.now(), text: `${message5003}\n${artMessage}\n${ocrMessage}` }]);
+
+
+      }
+      //const ocrMessage = ocrResult ? `OCR Text: ${ocrResult.text}` : 'You can scan the text description to get more accurate response.';
+      //setMessages([{ id: Date.now(), text: `${message5003}\n${artMessage}\n${ocrMessage}` }]);
+      setChatModalVisible(true);
+      setPhotoModalVisible(false);
+  };
+  
   
   
   const handleSendMessage = async () => {
@@ -235,7 +273,7 @@ const classDescriptions = {
           <View style={styles.centeredView}>
             <Image source={{ uri: firstPhoto?.uri }} style={styles.modalImage} />
             <Text style={styles.modalText}>What would you like to do with this photo?</Text>
-            <Button title="Add another photo" onPress={() => handleDecision('add')} />
+            <Button title="Add photo of text description" onPress={() => handleDecision('add')} />
             <Button title="Start chat with this photo" onPress={() => handleDecision('chat')} />
             <Button title="Retake" onPress={() => setPhotoModalVisible(false)} />
           </View>

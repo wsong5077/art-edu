@@ -9,9 +9,18 @@ const screenWidth = Dimensions.get('window').width;
 const Detailmodule = ({ navigation, route }) => {
     // Predefine imports for all images
     const images = {
-        monalisa: require('../images/monalisa.jpg'),
-        starry:require('../images/starry.jpg'),
+        persistenceOfMemory: require('../images/persistenceOfMemory.jpg'),
+        girlWithPearlEarring:require('../images/girlWithPearlEarring.jpg'),
+        nightWatch:require('../images/nightWatch.jpg'),
+        vinci: require('../images/davinci.jpg'),
+        van:require('../images/van.jpeg'),
+        monet:require('../images/monet.jpg'),
+        kahlo:require('../images/kahlo.jpg'),
+        picasso:require('../images/picasso.jpg'),
+        okeeffe:require('../images/okeeffe.jpg'),
         lilly:require('../images/Monet1.jpg'),
+        starry:require('../images/starry.jpg'),
+        monalisa:require('../images/monalisa.jpg'),
     };
   
     const { artwork } = route.params;

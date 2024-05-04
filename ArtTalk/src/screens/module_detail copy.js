@@ -4,7 +4,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollVi
 const screenWidth = Dimensions.get('window').width;
 
 const Detailmoduleartist = ({ navigation, route }) => {
-    const { artwork } = route.params;
+    const { artist } = route.params;
     const [showDescription, setShowDescription] = useState(false); // State to toggle description
     const [isChatVisible, setIsChatVisible] = useState(false);
     const [messages, setMessages] = useState([]);
@@ -13,6 +13,9 @@ const Detailmoduleartist = ({ navigation, route }) => {
         vinci: require('../images/davinci.jpg'),
         van:require('../images/van.jpeg'),
         monet:require('../images/monet.jpg'),
+        kahlo:require('../images/kahlo.jpg'),
+        picasso:require('../images/picasso.jpg'),
+        okeeffe:require('../images/okeeffe.jpg'),
     };
     const handleSendMessage = () => {
         if (inputText.trim() === '') return;
@@ -23,7 +26,7 @@ const Detailmoduleartist = ({ navigation, route }) => {
         // Clear the input field
         setInputText('');
     };
-
+    console.log(artist.localImage);
 
     return (
         <SafeAreaView style={styles.safeArea}>
@@ -35,20 +38,19 @@ const Detailmoduleartist = ({ navigation, route }) => {
                         />
                     </TouchableOpacity>
                     <Image
-                        source={images[artwork.localImage]}
+                        source={images[artist.localImage]}
                         style={styles.artworkImage}
                     />
                 <View style={styles.titleContainer}>
                     <Text style={styles.title}>
-                        {artwork.title}
+                        {artist.title}
                     </Text>
                    
                 </View>
-                {/* Conditional rendering for description */}
                 {showDescription && (
                     <View style={styles.descriptionContainer}>
                         <Text style={styles.description}>
-                            {artwork.description}
+                            {artist.description}
                         </Text>
                     </View>
                 )}
