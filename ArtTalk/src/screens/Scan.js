@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
-
 import { View, StyleSheet, Image, TouchableOpacity, Text, Modal, Button, TextInput, FlatList, Alert, Platform } from 'react-native';
 import { Camera } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -245,12 +244,25 @@ const classDescriptions = {
     setChatModalVisible(true);
     setTextModalVisible(false);
 };
+  const cleanTitle = (originalTitle) => {
+    const parts = originalTitle.split('_');
+    const title = parts[0].replace('-', ' ').replaceAll(/[^\w\s]/g, ' ');
+    const artist = parts[1].replace('-', ' ').replaceAll(/[^\w\s]/g, ' ');
+    const time = parts[2];  
+
+    return `${title} by artist ${artist} created in ${time}`;
+        
+    };
+   
   const updateUI = (artResult5003, artResult5001, ocrResult) => {
       console.log(artResult5003);
       console.log(artResult5001);
       //const message5003 = `This artwork is likely to be: ${artResult5003.title}`;
-      const cleanTitle = artResult5003.title.replace(/_/g, ' ').replace(/[^\w\s]/gi, '');
-      const message5003 = `This artwork is likely to be: ${cleanTitle}`;
+      //const cleanTitle = artResult5003.title.replace(/_/g, ' ').replace(/[^\w\s]/gi, ' ');
+      const cleanTitle5003 = cleanTitle(artResult5003.title);
+      const message5003 = `This artwork is likely to be: ${cleanTitle5003}`;
+
+      //const message5003 = `This artwork is likely to be: ${cleanTitle}`;
 
       const artDescription = classDescriptions[artResult5001.class] || "No description available for this class.";
       const artMessage = `The style is likely to be: ${artResult5001.class}. ${artDescription}`;
