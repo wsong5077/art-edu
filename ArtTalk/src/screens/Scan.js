@@ -51,8 +51,10 @@ const classDescriptions = {
     const [hasPermission, setHasPermission] = useState(null);
     const [cameraRef, setCameraRef] = useState(null);
     const [firstPhoto, setFirstPhoto] = useState(null);
+    const [textPhoto, setTextPhoto] = useState(null);
     const [secondPhoto, setSecondPhoto] = useState(null);
     const [photoModalVisible, setPhotoModalVisible] = useState(false);
+    const [textModalVisible, setTextModalVisible] = useState(false);
     const [decisionModalVisible, setDecisionModalVisible] = useState(false);
     const [chatModalVisible, setChatModalVisible] = useState(false);
     const [messages, setMessages] = useState([]);
@@ -72,13 +74,20 @@ const classDescriptions = {
         }
       })();
     }, []);
+
+    const takeTextPicture = async () => {
+      if (cameraRef) {
+        const textPhoto = await cameraRef.takePictureAsync();
+        setTextPhoto(textPhoto);
+        setTextModalVisible(true);
+      }
+    };
   
     const takePicture = async () => {
       if (cameraRef) {
         const photo = await cameraRef.takePictureAsync();
         console.log(photo);
         setFirstPhoto(photo);
-        //console.log(firstPhoto);
         setPhotoModalVisible(true);
       }
     };
@@ -124,7 +133,38 @@ const classDescriptions = {
         await processPhotos(firstPhoto, null);
       }
     };
+
+    const handleTextDecision = async (option) => {
+      processtextPhotos(textPhoto);
+      
+    };
   
+    const processtextPhotos = async (textPhoto) => {
+      const manipResult = await manipulateAsync(
+        textPhoto.localUri || textPhoto.uri,
+        [],
+        { compress: 1, format: SaveFormat.JPEG }
+      );
+ 
+      const secondFormData = new FormData();
+      const secondBlob = await (await fetch(manipResult.uri)).blob();
+      secondFormData.append('file', secondBlob, 'secondImage.jpg');
+      try{
+      const ocrResponse = await fetch('http://127.0.0.1:5000/recognize', {
+                  method: 'POST',
+                 
+                  body: secondFormData,
+              });
+  
+      const ocrResult = await ocrResponse.json();
+      console.log('OCR result:', ocrResult);
+      updateTextUI(ocrResult);
+    } catch (error) {
+      console.error('Error processing images:', error);
+      alert('Error processing images: ' + error.message);
+  }
+};
+
     const processPhotos = async (first, second) => {
       const manipResult = await manipulateAsync(
         first.localUri || first.uri,
@@ -188,11 +228,30 @@ const classDescriptions = {
           alert('Error processing images: ' + error.message);
       }
   };
-  
+  const updateTextUI = (ocrResult) => {
+    if (ocrResult){
+      console.log(ocrResult);
+      const ocrMessage = ocrResult ? `OCR Text: ${ocrResult.text}` : 'You can scan the text description to get more accurate response.';
+      setMessages([{ id: Date.now(), text: `${ocrMessage}` }]);
+
+    }else{
+      console.log(ocrResult);
+
+      const ocrMessage = ocrResult ? `OCR Text: ${ocrResult.text}` : 'You can scan the text description to get more accurate response.';
+      setMessages([{ id: Date.now(), text: `${ocrMessage}` }]);
+
+
+    }
+    setChatModalVisible(true);
+    setTextModalVisible(false);
+};
   const updateUI = (artResult5003, artResult5001, ocrResult) => {
       console.log(artResult5003);
       console.log(artResult5001);
-      const message5003 = `This artwork is likely to be: ${artResult5003.title}`;
+      //const message5003 = `This artwork is likely to be: ${artResult5003.title}`;
+      const cleanTitle = artResult5003.title.replace(/_/g, ' ').replace(/[^\w\s]/gi, '');
+      const message5003 = `This artwork is likely to be: ${cleanTitle}`;
+
       const artDescription = classDescriptions[artResult5001.class] || "No description available for this class.";
       const artMessage = `The style is likely to be: ${artResult5001.class}. ${artDescription}`;
       if (ocrResult){
@@ -253,6 +312,9 @@ const classDescriptions = {
       <View style={styles.container}>
         <Camera style={styles.camera} ref={setCameraRef} />
         <View style={styles.buttonContainer}>
+             <TouchableOpacity onPress={takeTextPicture} style={styles.docscanButton}>
+                 <MaterialIcons name="document-scanner" size={36} color="#fff" />
+             </TouchableOpacity>
           <TouchableOpacity onPress={takePicture} style={styles.captureButton}>
             <MaterialIcons name="camera" size={36} color="#fff" />
           </TouchableOpacity>
@@ -273,9 +335,26 @@ const classDescriptions = {
           <View style={styles.centeredView}>
             <Image source={{ uri: firstPhoto?.uri }} style={styles.modalImage} />
             <Text style={styles.modalText}>What would you like to do with this photo?</Text>
-            <Button title="Add photo of text description" onPress={() => handleDecision('add')} />
+            <Button title="Add a picture of the text description" onPress={() => handleDecision('add')} />
             <Button title="Start chat with this photo" onPress={() => handleDecision('chat')} />
             <Button title="Retake" onPress={() => setPhotoModalVisible(false)} />
+          </View>
+        </Modal>
+
+        <Modal
+          animationType="slide"
+          transparent={false}
+          visible={textModalVisible}
+          onRequestClose={() => {
+            Alert.alert("Modal has been closed.");
+            setTextModalVisible(!textModalVisible);
+          }}
+        >
+          <View style={styles.centeredView}>
+            <Image source={{ uri: textPhoto?.uri }} style={styles.modalImage} />
+            <Text style={styles.modalText}>You have provided a picture of the text description.</Text>
+            <Button title="Start chat with this photo" onPress={() => handleTextDecision('chat')} />
+            <Button title="Retake" onPress={() => setTextModalVisible(false)} />
           </View>
         </Modal>
   
@@ -397,17 +476,19 @@ captureButton: { // Capture button centered
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft:35
+    //marginLeft:35
 },
 docscanButton:{
   flexGrow: 0,
   alignItems: 'flex-start',
   justifyContent: 'center',
+  marginLeft:10
 },
 uploadButton: { // Upload button right
     flexGrow: 0,
     alignItems: 'flex-end',
     justifyContent: 'center',
+    marginRight:10
 },
 retakeButton: { 
     flexGrow: 1,
