@@ -2,6 +2,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, SafeAreaView, ScrollVi
 import React, { useState, useEffect, useRef } from 'react'; // Import useEffect and useRef
 
 import axios from 'axios';
+import { getAccessToken } from '../utils/tokenHelper';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -62,6 +63,16 @@ const Detailmodule = ({ navigation, route }) => {
     
         const messageToSend = { id: Date.now(), text: inputText, owner: 'user' };
         setMessages(messages => [...messages, messageToSend]);
+
+        // placeholder for api gateway
+        const token = await getAccessToken();
+        if (token) {
+            console.log('Got Token:', token);
+        }
+        else {
+            console.log('No Token Found');
+        }
+        
     
         try {
             const response = await axios.post('http://0.0.0.0:8000/chat/', {
