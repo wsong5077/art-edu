@@ -2,20 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useAuth } from './AuthContext'; 
 import * as AppleAuthentication from 'expo-apple-authentication';
+import handleLogin from './authServiceLogin';
+import { handleEmailChange } from '../utils/checkEmail';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  //const { loginUser } = useAuth(); // Use the loginUser method from context
-  const loginUser = (userDetails) => {
-    setUserInfo(userDetails);
-    setAuthenticated(true);
-  };
-  
+  const [isEmailValid, setIsEmailValid] = useState(true);
+  const { loginUser } = useAuth();
 
-  const handleLogin = () => {
-    loginUser(email, password); // Update context with user info
-    navigation.navigate('Home'); // Navigate to the home screen after login
+  const onChangeEmail = (text) => {
+    handleEmailChange(text, setEmail, setIsEmailValid);
   };
 
   const handleAppleLogin = async () => {
@@ -49,11 +46,14 @@ const LoginScreen = ({ navigation }) => {
     <View style={styles.container}>
       
       <Text style={styles.title}>Login</Text>
+      {!isEmailValid && (
+        <Text style={styles.errorText}>Invalid email format</Text> // Display error message if email is invalid
+      )}
       <TextInput
         style={styles.input}
-        onChangeText={setEmail}
+        onChangeText={onChangeEmail}
         value={email}
-        placeholder="Email"
+        placeholder="abc@example.com"
         keyboardType="email-address"
         autoCapitalize="none"
       />
@@ -66,7 +66,7 @@ const LoginScreen = ({ navigation }) => {
       />
       <Button
         title="Login"
-        onPress={handleLogin}
+        onPress={() => handleLogin(email, password, navigation, loginUser)}
       />
       <Button
         title="Don't have an account? Sign up"
@@ -125,6 +125,13 @@ const styles = StyleSheet.create({
     width: 200,
     height: 44,
   },
+  errorText: {
+    color: 'red', // Error text in red for visibility
+    fontSize: 12,
+    marginBottom: 5,
+    alignSelf: 'flex-start', // Align text to the left
+    marginLeft: 12 // Match the input text margin
+  }
 });
 
 export default LoginScreen;
